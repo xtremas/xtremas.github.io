@@ -3,36 +3,66 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Product Detail</title>
-    <link rel="stylesheet" href="main1.css"> <!-- Link ke CSS -->
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> <!-- Link ke jQuery -->
-    <script src="main1.js" defer></script> <!-- Link ke file JavaScript terpisah -->
+    <meta name="description" content="{{title}} - Discover amazing discounts on this product. Shop now and save!">
+    <title>{{title}} - Best Diskon Product</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="main1.css"> <!-- Link to the external CSS -->
 </head>
 <body>
-    <header>
-        <h1>Product Detail</h1>
-        <!-- Tambahkan elemen navigasi atau logo di sini -->
-    </header>
+    <div class="container" id="content">
+        <div class="breadcrumb">
+            <a href="/">Home</a> &gt; <a href="/products">Products</a> &gt; <span id="breadcrumb-title">Product Title</span>
+        </div>
 
-    <main>
-        <section class="product-detail">
-            <h2 id="product-title">Nama Produk</h2>
-            <img id="product-image" src="path/to/image.jpg" alt="Product Image">
-            <p id="product-description">Deskripsi produk akan ditampilkan di sini.</p>
-            <p id="product-price">Harga: <span id="price-value">USD 76.89</span></p>
-            <button id="buy-button">Beli Sekarang</button>
-        </section>
-
-        <section class="related-products">
-            <h3>Produk Terkait</h3>
-            <div id="related-products-list">
-                <!-- Daftar produk terkait akan dimuat di sini -->
+        <div class="product-section">
+            <div id="product-detail" class="product-detail">
+                <!-- Product detail content will be rendered here -->
             </div>
-        </section>
-    </main>
+        </div>
+ 
+        <div class="search-bar">
+            <input type="text" id="search-input" placeholder="Search for related products..." autocomplete="off">
+            <button id="search-button">Search</button>
+        </div>
 
-    <footer>
-        <p>&copy; 2024 Nama Perusahaan. Semua hak dilindungi.</p>
-    </footer>
+        <div class="related-products-section">
+            <h2>Related Products</h2>
+            <div id="related-products-list" class="related-products">
+                <!-- Related products content will be rendered here -->
+            </div>
+            <div class="pagination">
+                <button id="load-more">Load More</button>
+            </div>
+        </div>
+    </div>
+
+    <script id="product-template" type="x-tmpl-mustache">
+        <div class="product-detail">
+            <img src="{{imageUrl}}" class="lazy" alt="{{title}}" onerror="this.src='default-image.jpg'">
+            <div class="details">
+                <h1>{{title}}</h1>
+                <p>Category: {{category}}</p>
+                <p class="price">Price: <span>{{discountPrice}}</span> <span class="discount-price">({{originPrice}})</span></p>
+                <p class="discount">Discount: {{discount}}</p>
+                <p>Don't Miss Out: {{title}} Shop Now! is available with {{discount}}. Buy more than 2 items and get an extra 10% discount and free shipping. Claim your products now!</p>
+                <a class="buy-now" href="{{promotionUrl}}"><font color='white'><b>Shop Now</b></font></a>
+            </div>
+        </div>
+    </script>
+
+    <script id="related-products-template" type="x-tmpl-mustache">
+        {{#relatedProducts}}
+        <div class="product-item">
+            <a href="/p/product.html?productId={{id}}">
+                <img src="{{imageUrl}}" alt="{{title}}" class="lazy" onerror="this.src='default-image.jpg'">
+            </a>
+            <p>Price: <span>{{discountPrice}}</span></p>
+            <p class="discount">Discount: {{discount}}</p>
+        </div>
+        {{/relatedProducts}}
+    </script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mustache.js/4.2.0/mustache.min.js"></script>
+    <script src="main1.js"></script> <!-- Link to the external JavaScript -->
 </body>
 </html>
