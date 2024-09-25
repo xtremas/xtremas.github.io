@@ -25,5 +25,17 @@ document.addEventListener("DOMContentLoaded", function () {
     })
     .catch(error => console.log('Error loading footer:', error));
 });
+fetch('header.html')
+  .then(response => {
+    console.log(response);  // Tambahkan ini untuk melihat respons
+    if (!response.ok) {
+      throw new Error('Network response was not ok');
+    }
+    return response.text();
+  })
+  .then(data => {
+    document.getElementById('header-placeholder').innerHTML = data;
+  })
+  .catch(error => console.error('Error fetching header:', error));
 
 </script>
