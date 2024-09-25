@@ -1,31 +1,38 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Product List</title>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400&display=swap" rel="stylesheet" />
-    <link rel="stylesheet" href="main.css"> <!-- Link ke CSS -->
+    <title>Product Detail</title>
+    <link rel="stylesheet" href="main1.css"> <!-- Link ke CSS -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> <!-- Link ke jQuery -->
+    <script src="main1.js" defer></script> <!-- Link ke file JavaScript terpisah -->
 </head>
 <body>
-    <div class="container" id="content">
-        <div class="search-bar">
-            <input type="text" id="search-input" placeholder="Search for products..." />
-            <button id="search-button">Search</button>
-        </div>
+    <header>
+        <h1>Product Detail</h1>
+        <!-- Tambahkan elemen navigasi atau logo di sini -->
+    </header>
 
-        <div class="category-links"></div>
+    <main>
+        <section class="product-detail">
+            <h2 id="product-title">Nama Produk</h2>
+            <img id="product-image" src="path/to/image.jpg" alt="Product Image">
+            <p id="product-description">Deskripsi produk akan ditampilkan di sini.</p>
+            <p id="product-price">Harga: <span id="price-value">USD 76.89</span></p>
+            <button id="buy-button">Beli Sekarang</button>
+        </section>
 
-        <div class="product-list" id="product-list"></div>
+        <section class="related-products">
+            <h3>Produk Terkait</h3>
+            <div id="related-products-list">
+                <!-- Daftar produk terkait akan dimuat di sini -->
+            </div>
+        </section>
+    </main>
 
-        <div class="pagination" id="pagination">
-            <div class="pagination-buttons" id="pagination-buttons"></div>
-            <div class="pagination-info" id="pagination-info"></div>
-        </div>
-    </div>
-
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/mustache.js/4.2.0/mustache.min.js"></script>
-    <script src="main1.js"></script> <!-- Link ke JavaScript -->
+    <footer>
+        <p>&copy; 2024 Nama Perusahaan. Semua hak dilindungi.</p>
+    </footer>
 </body>
 </html>
