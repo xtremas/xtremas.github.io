@@ -1,25 +1,30 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Website with Separate Header & Footer</title>
-  <link rel="stylesheet" href="main.css">
-  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product List</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
+    <div class="container" id="content">
+        <div class="search-bar">
+            <input type="text" id="search-input" placeholder="Search for products..." />
+            <button id="search-button">Search</button>
+        </div>
 
-  <!-- Placeholder for Header -->
-  <div id="header-placeholder"></div>
+        <div class="category-links"></div>
 
-  <main>
-    <h1>Welcome to the Home Page</h1>
-    <p>This is the content of the index page.</p>
-  </main>
+        <div class="product-list" id="product-list"></div>
 
-  <!-- Placeholder for Footer -->
-  <div id="footer-placeholder"></div>
+        <div class="pagination" id="pagination">
+            <div class="pagination-buttons" id="pagination-buttons"></div>
+            <div class="pagination-info" id="pagination-info"></div>
+        </div>
+    </div>
 
-  <script src="main.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mustache.js/4.2.0/mustache.min.js"></script>
+    <script src="main.js"></script>
 </body>
 </html>
