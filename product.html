@@ -6,9 +6,11 @@
     <meta name="description" content="{{title}} - Discover amazing discounts on this product. Shop now and save!">
     <title>{{title}} - Best Diskon Product</title>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="main1.css"> <!-- Link to the external CSS -->
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
+    <div id="header"></div> <!-- Placeholder for header -->
+    
     <div class="container" id="content">
         <div class="breadcrumb">
             <a href="/">Home</a> &gt; <a href="/products">Products</a> &gt; <span id="breadcrumb-title">Product Title</span>
@@ -35,6 +37,8 @@
             </div>
         </div>
     </div>
+
+    <div id="footer"></div> <!-- Placeholder for footer -->
 
     <script id="product-template" type="x-tmpl-mustache">
         <div class="product-detail">
@@ -63,6 +67,38 @@
     </script>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/mustache.js/4.2.0/mustache.min.js"></script>
-    <script src="main1.js"></script> <!-- Link to the external JavaScript -->
+    <script src="script.js"></script>
+    <script>
+        // Load header and footer after DOM is fully loaded
+        document.addEventListener("DOMContentLoaded", function() {
+            loadHeaderAndFooter();
+        });
+
+        function loadHeaderAndFooter() {
+            fetch('header.html')
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.text();
+                })
+                .then(data => {
+                    document.getElementById('header').innerHTML = data;
+                })
+                .catch(error => console.error('Error loading header:', error));
+
+            fetch('footer.html')
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.text();
+                })
+                .then(data => {
+                    document.getElementById('footer').innerHTML = data;
+                })
+                .catch(error => console.error('Error loading footer:', error));
+        }
+    </script>
 </body>
 </html>
