@@ -63,10 +63,10 @@ function renderProducts(products) {
         item.className = 'product-item';
         item.innerHTML = `
             <img src="${product[1]}" alt="${product[7]}">
-            <div class="product-title"><a href="/p/product.html?productId=${product[0]}">${product[7]}</a></div>
+            <div class="product-title"><a href="product.html?productId=${product[0]}">${product[7]}</a></div>
             <div class="product-category">${product[8]}</div>
             <div class="product-price">${product[4]} <span class="discount-price">${product[3]}</span></div>
-            <a class="read-more" href="/p/product.html?productId=${product[0]}">Read More</a>
+            <a class="read-more" href="product.html?productId=${product[0]}">Read More</a>
         `;
         productList.appendChild(item);
     });
