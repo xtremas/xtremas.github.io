@@ -9,18 +9,29 @@ let activeFilter = 'all';
 
 function render() {
   const filtered = currentResults.filter(item => activeFilter === 'all' || (activeFilter === 'question' && item.intent === 'Pertanyaan'));
-  resultsBody.innerHTML = filtered.map(item => `<tr><td class="keyword">${item.keyword}</td><td><span class="intent">${item.intent}</span></td><td class="source">Google Suggest</td><td><button class="row-copy" data-keyword="${item.keyword}" title="Salin kata kunci">⧉</button></td></tr>`).join('');
+  resultsBody.innerHTML = filtered.map(item => `<tr><td class="keyword">${escapeHtml(item.keyword)}</td><td><span class="intent">${item.intent}</span></td><td class="source">Google Suggest</td><td><button class="row-copy" data-keyword="${escapeHtml(item.keyword)}" title="Salin kata kunci">⧉</button></td></tr>`).join('');
   allCount.textContent = currentResults.length;
+}
+function escapeHtml(value) { return value.replace(/[&<>"']/g, character => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' }[character])); }
+function fetchSuggestions(seed) {
+  return new Promise((resolve, reject) => {
+    const callbackName = `kataKunciCallback${Date.now()}`;
+    const script = document.createElement('script');
+    const timeout = window.setTimeout(() => { cleanup(); reject(new Error('Request timeout')); }, 8000);
+    const cleanup = () => { window.clearTimeout(timeout); delete window[callbackName]; script.remove(); };
+    window[callbackName] = data => { cleanup(); resolve(data[1] || []); };
+    script.onerror = () => { cleanup(); reject(new Error('Google Suggest tidak merespons')); };
+    script.src = `https://suggestqueries.google.com/complete/search?client=firefox&hl=id&callback=${callbackName}&q=${encodeURIComponent(seed)}`;
+    document.head.appendChild(script);
+  });
 }
 async function generate(seed = keywordInput.value.trim()) {
   if (!seed) { keywordInput.focus(); showToast('Tulis kata kunci terlebih dahulu'); return; }
   generateButton.disabled = true;
   generateButton.querySelector('span').textContent = 'Mengambil saran...';
   try {
-    const response = await fetch(`https://suggestqueries.google.com/complete/search?client=firefox&hl=id&q=${encodeURIComponent(seed)}`);
-    if (!response.ok) throw new Error('Google Suggest tidak merespons');
-    const data = await response.json();
-    currentResults = data[1].map(keyword => ({ keyword, intent: /^(apa|apakah|bagaimana|kenapa|mengapa|kapan|dimana|di mana)\b/i.test(keyword) ? 'Pertanyaan' : 'Saran umum' }));
+    const suggestions = await fetchSuggestions(seed);
+    currentResults = suggestions.map(keyword => ({ keyword, intent: /^(apa|apakah|bagaimana|kenapa|mengapa|kapan|dimana|di mana)\b/i.test(keyword) ? 'Pertanyaan' : 'Saran umum' }));
     activeFilter = 'all';
     document.querySelector('#updated-at').textContent = new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
   } catch (error) {
