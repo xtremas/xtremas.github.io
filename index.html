@@ -1,33 +1,53 @@
 <!doctype html>
-<html lang="en">
+<html lang="id">
 <head>
-    <script src="https://alwingulla.com/88/tag.min.js" data-zone="108341" async data-cfasync="false"></script>
-    <meta name="monetag" content="4a07488b6b29acea20d263a98fa72c99">
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Product List</title>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400&display=swap" rel="stylesheet" />
-    <link rel="stylesheet" href="main.css">
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> <!-- Added jQuery -->
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Riset kata kunci sederhana, gratis, dan berjalan langsung di browser.">
+  <title>KataKunci | Riset kata kunci gratis</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="main.css">
 </head>
 <body>
-    <div class="container" id="content">
-        <div class="search-bar">
-            <input type="text" id="search-input" placeholder="Search for products..." />
-            <button id="search-button">Search</button>
+  <header class="topbar">
+    <a class="brand" href="./" aria-label="KataKunci beranda"><span class="brand-mark">K</span><span>Kata<span>Kunci</span></span></a>
+    <div class="topbar-note"><span class="status-dot"></span> 100% gratis · tanpa akun</div>
+  </header>
+
+  <main>
+    <section class="hero">
+      <div class="hero-copy">
+        <p class="eyebrow">RISET SEO, TANPA RIBET</p>
+        <h1>Temukan kata yang<br><em>dicari orang.</em></h1>
+        <p class="intro">Ubah satu ide menjadi saran pencarian nyata dari Google. Cepat, gratis, dan tanpa akun atau API key.</p>
+      </div>
+      <div class="search-panel">
+        <label for="keyword-input">Mulai dari satu kata kunci</label>
+        <div class="search-row">
+          <input id="keyword-input" type="text" placeholder="contoh: kopi susu" autocomplete="off" maxlength="80">
+          <button id="generate-button" class="primary-button" type="button"><span>Temukan ide</span><span aria-hidden="true">→</span></button>
         </div>
+        <div class="example-row"><span>Coba:</span><button class="example" type="button">tanaman hias</button><button class="example" type="button">bisnis online</button><button class="example" type="button">resep ayam</button></div>
+      </div>
+    </section>
 
-        <div class="category-links"></div>
-
-        <div class="product-list" id="product-list"></div>
-
-        <div class="pagination" id="pagination">
-            <div class="pagination-buttons" id="pagination-buttons"></div>
-            <div class="pagination-info" id="pagination-info"></div>
-        </div>
-    </div>
-
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/mustache.js/4.2.0/mustache.min.js"></script>
-    <script src="main.js"></script>
+    <section class="results-section" id="results-section" aria-live="polite">
+      <div class="results-head">
+        <div><p class="eyebrow">HASIL GOOGLE SUGGEST</p><h2 id="result-title">Saran kata kunci</h2></div>
+        <div class="result-actions"><button id="copy-button" class="quiet-button" type="button" title="Salin semua hasil">⧉ <span>Salin</span></button><button id="export-button" class="quiet-button" type="button" title="Unduh sebagai CSV">↓ <span>Ekspor CSV</span></button></div>
+      </div>
+      <div class="toolbar">
+        <div class="tabs" role="tablist"><button class="tab active" data-filter="all" type="button">Semua <b id="all-count">0</b></button><button class="tab" data-filter="question" type="button">Pertanyaan</button></div>
+        <span class="live-label"><span class="status-dot"></span> Diambil langsung · <span id="updated-at">baru saja</span></span>
+      </div>
+      <div class="table-wrap"><table><thead><tr><th>SARAN PENCARIAN</th><th>JENIS</th><th>SUMBER</th><th><span class="sr-only">Aksi</span></th></tr></thead><tbody id="results-body"></tbody></table></div>
+      <p class="disclaimer">Google Suggest menampilkan frasa yang disarankan berdasarkan aktivitas pencarian. Google tidak menyediakan volume atau persaingan melalui endpoint gratis ini.</p>
+    </section>
+  </main>
+  <footer><span>© 2026 KataKunci</span><span>Data tetap di perangkatmu · tidak ada tracking</span></footer>
+  <div class="toast" id="toast" role="status"></div>
+  <script src="main.js"></script>
 </body>
 </html>

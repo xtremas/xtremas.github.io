@@ -1,173 +1,49 @@
-$(document).ready(function() {
-  // Load header
-  $("#header-placeholder").load("header.html", function(response, status, xhr) {
-    if (status == "error") {
-      console.error("Error loading header: " + xhr.status + " " + xhr.statusText);
-    }
-  });
+const keywordInput = document.querySelector('#keyword-input');
+const generateButton = document.querySelector('#generate-button');
+const resultsBody = document.querySelector('#results-body');
+const resultTitle = document.querySelector('#result-title');
+const allCount = document.querySelector('#all-count');
+const toast = document.querySelector('#toast');
+let currentResults = [];
+let activeFilter = 'all';
 
-  // Load footer
-  $("#footer-placeholder").load("footer.html", function(response, status, xhr) {
-    if (status == "error") {
-      console.error("Error loading footer: " + xhr.status + " " + xhr.statusText);
-    }
-  });
-});
-  document.addEventListener("DOMContentLoaded", function() {
-    const menuToggle = document.querySelector(".menu-toggle");
-    const navMenu = document.querySelector(".nav-menu");
-
-    menuToggle.addEventListener("click", function() {
-      navMenu.classList.toggle("active");
-    });
-  });
-const sheetId = '1dRJ72TYn9eBq-VK4sngnZqTCc-1eWNRBuhK6pMrSnt8';
-const apiKey = 'AIzaSyCpmFiIHxwX6XhPbvZYTytfpiv_DcA1b2g';
-const range = 'Sheet1';
-
-let currentPage = 1;
-const productsPerPage = 12;
-let totalProducts = 0;
-let currentSearchTerm = '';
-let currentCategory = '';
-
-function fetchProducts(page, searchTerm = '', category = '') {
-    fetch(`https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/${range}?key=${apiKey}`)
-        .then(response => response.json())
-        .then(data => {
-            const rows = data.values;
-            totalProducts = rows.length - 1; // Adjust for header row
-            const filteredRows = rows.slice(1).filter(row =>
-                (category === '' || row[8].toLowerCase() === category.toLowerCase()) &&
-                row[7].toLowerCase().includes(searchTerm.toLowerCase())
-            );
-            const start = (page - 1) * productsPerPage;
-            const end = Math.min(start + productsPerPage, filteredRows.length);
-
-            const products = filteredRows.slice(start, end);
-
-            renderProducts(products);
-            renderPagination(filteredRows.length, page);
-        })
-        .catch(error => {
-            console.error('Error fetching products:', error);
-        });
+function render() {
+  const filtered = currentResults.filter(item => activeFilter === 'all' || (activeFilter === 'question' && item.intent === 'Pertanyaan'));
+  resultsBody.innerHTML = filtered.map(item => `<tr><td class="keyword">${item.keyword}</td><td><span class="intent">${item.intent}</span></td><td class="source">Google Suggest</td><td><button class="row-copy" data-keyword="${item.keyword}" title="Salin kata kunci">⧉</button></td></tr>`).join('');
+  allCount.textContent = currentResults.length;
 }
-
-function renderProducts(products) {
-    const productList = document.getElementById('product-list');
-    productList.innerHTML = '';
-
-    products.forEach(product => {
-        const item = document.createElement('div');
-        item.className = 'product-item';
-        item.innerHTML = `
-            <img src="${product[1]}" alt="${product[7]}">
-            <div class="product-title"><a href="product.html?productId=${product[0]}">${product[7]}</a></div>
-            <div class="product-category">${product[8]}</div>
-            <div class="product-price">${product[4]} <span class="discount-price">${product[3]}</span></div>
-            <a class="read-more" href="product.html?productId=${product[0]}">Read More</a>
-        `;
-        productList.appendChild(item);
-    });
+async function generate(seed = keywordInput.value.trim()) {
+  if (!seed) { keywordInput.focus(); showToast('Tulis kata kunci terlebih dahulu'); return; }
+  generateButton.disabled = true;
+  generateButton.querySelector('span').textContent = 'Mengambil saran...';
+  try {
+    const response = await fetch(`https://suggestqueries.google.com/complete/search?client=firefox&hl=id&q=${encodeURIComponent(seed)}`);
+    if (!response.ok) throw new Error('Google Suggest tidak merespons');
+    const data = await response.json();
+    currentResults = data[1].map(keyword => ({ keyword, intent: /^(apa|apakah|bagaimana|kenapa|mengapa|kapan|dimana|di mana)\b/i.test(keyword) ? 'Pertanyaan' : 'Saran umum' }));
+    activeFilter = 'all';
+    document.querySelector('#updated-at').textContent = new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
+  } catch (error) {
+    currentResults = [];
+    showToast('Saran gagal diambil. Coba lagi.');
+  } finally {
+    generateButton.disabled = false;
+    generateButton.querySelector('span').textContent = 'Temukan ide';
+  }
+  resultTitle.textContent = `Saran untuk “${seed}”`;
+  document.querySelectorAll('.tab').forEach(tab => tab.classList.toggle('active', tab.dataset.filter === 'all'));
+  render();
 }
-
-function renderPagination(total, current) {
-    const paginationButtons = document.getElementById('pagination-buttons');
-    const paginationInfo = document.getElementById('pagination-info');
-    paginationButtons.innerHTML = '';
-    paginationInfo.innerHTML = '';
-
-    const totalPages = Math.ceil(total / productsPerPage);
-
-    // Create Previous button
-    const prevButton = document.createElement('button');
-    prevButton.textContent = 'Previous';
-    prevButton.disabled = current === 1;
-    prevButton.onclick = () => {
-        if (current > 1) {
-            fetchProducts(current - 1, currentSearchTerm, currentCategory);
-        }
-    };
-    paginationButtons.appendChild(prevButton);
-
-    // Create Page number buttons
-    const pageButtonCount = 5; // Number of page buttons to display
-    const startPage = Math.max(1, current - Math.floor(pageButtonCount / 2));
-    const endPage = Math.min(totalPages, startPage + pageButtonCount - 1);
-
-    if (startPage > 1) {
-        const firstPageButton = document.createElement('button');
-        firstPageButton.textContent = '1';
-        firstPageButton.onclick = () => fetchProducts(1, currentSearchTerm, currentCategory);
-        paginationButtons.appendChild(firstPageButton);
-
-        if (startPage > 2) {
-            const ellipsis = document.createElement('span');
-            ellipsis.textContent = '...';
-            paginationButtons.appendChild(ellipsis);
-        }
-    }
-
-    for (let i = startPage; i <= endPage; i++) {
-        const button = document.createElement('button');
-        button.textContent = i;
-        button.disabled = i === current;
-        button.onclick = () => fetchProducts(i, currentSearchTerm, currentCategory);
-        paginationButtons.appendChild(button);
-    }
-
-    if (endPage < totalPages) {
-        if (endPage < totalPages - 1) {
-            const ellipsis = document.createElement('span');
-            ellipsis.textContent = '...';
-            paginationButtons.appendChild(ellipsis);
-        }
-
-        const lastPageButton = document.createElement('button');
-        lastPageButton.textContent = totalPages;
-        lastPageButton.onclick = () => fetchProducts(totalPages, currentSearchTerm, currentCategory);
-        paginationButtons.appendChild(lastPageButton);
-    }
-
-    // Create Next button
-    const nextButton = document.createElement('button');
-    nextButton.textContent = 'Next';
-    nextButton.disabled = current === totalPages;
-    nextButton.onclick = () => {
-        if (current < totalPages) {
-            fetchProducts(current + 1, currentSearchTerm, currentCategory);
-        }
-    };
-    paginationButtons.appendChild(nextButton);
-
-    // Update pagination info
-    paginationInfo.textContent = `Page ${current} of ${totalPages}`;
+function showToast(message) { toast.textContent = message; toast.classList.add('show'); window.clearTimeout(showToast.timer); showToast.timer = window.setTimeout(() => toast.classList.remove('show'), 2200); }
+function copyText(text) {
+  if (!navigator.clipboard) { showToast('Salin manual dari hasil yang dipilih'); return; }
+  navigator.clipboard.writeText(text).then(() => showToast('Kata kunci disalin'));
 }
-
-// Add event listeners
-document.getElementById('search-button').addEventListener('click', () => {
-    currentSearchTerm = document.getElementById('search-input').value;
-    fetchProducts(1, currentSearchTerm, currentCategory);
-});
-
-// Initialize products on page load
-fetchProducts(currentPage);
-  // Load header and footer
-        function loadHeaderAndFooter() {
-            fetch('header.html')
-                .then(response => response.text())
-                .then(data => {
-                    document.getElementById('header').innerHTML = data;
-                })
-                .catch(error => console.error('Error loading header:', error));
-
-            fetch('footer.html')
-                .then(response => response.text())
-                .then(data => {
-                    document.getElementById('footer').innerHTML = data;
-                })
-                .catch(error => console.error('Error loading footer:', error));
-        }
-
-        loadHeaderAndFooter(); // Call the function to load header and footer
+generateButton.addEventListener('click', () => generate());
+keywordInput.addEventListener('keydown', event => { if (event.key === 'Enter') generate(); });
+document.querySelectorAll('.example').forEach(button => button.addEventListener('click', () => { keywordInput.value = button.textContent; generate(); }));
+document.querySelectorAll('.tab').forEach(tab => tab.addEventListener('click', () => { activeFilter = tab.dataset.filter; document.querySelectorAll('.tab').forEach(item => item.classList.toggle('active', item === tab)); render(); }));
+document.querySelector('#copy-button').addEventListener('click', () => copyText(currentResults.map(item => item.keyword).join('\n')));
+document.querySelector('#export-button').addEventListener('click', () => { const csv = 'Kata kunci,Intensi,Sumber\n' + currentResults.map(item => [item.keyword, item.intent, 'Google Suggest'].map(value => `"${String(value).replaceAll('"', '""')}"`).join(',')).join('\n'); const link = document.createElement('a'); link.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv' })); link.download = 'saran-google-suggest.csv'; link.click(); URL.revokeObjectURL(link.href); showToast('CSV berhasil diunduh'); });
+resultsBody.addEventListener('click', event => { const button = event.target.closest('[data-keyword]'); if (button) copyText(button.dataset.keyword); });
+generate('kopi susu');
