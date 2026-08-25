@@ -11,7 +11,7 @@ let callbackId = 0;
 
 function render() {
   const filtered = currentResults.filter(item => activeFilter === 'all' || (activeFilter === 'question' && item.intent === 'Pertanyaan'));
-  resultsBody.innerHTML = filtered.map(item => `<tr><td class="keyword">${escapeHtml(item.keyword)}</td><td><span class="intent">${item.intent}</span></td><td class="source">Google Suggest</td><td><button class="row-copy" data-keyword="${escapeHtml(item.keyword)}" title="Salin kata kunci">⧉</button></td></tr>`).join('');
+  resultsBody.innerHTML = filtered.map(item => `<tr><td class="keyword">${escapeHtml(item.keyword)}</td><td><span class="intent">${item.intent}</span></td><td class="source">Google Suggest</td><td class="row-actions"><button class="short-button" data-short="${escapeHtml(item.keyword)}" title="Ubah menjadi keyword pendek">Short</button><button class="row-copy" data-keyword="${escapeHtml(item.keyword)}" title="Salin kata kunci">⧉</button></td></tr>`).join('');
   allCount.textContent = currentResults.length;
 }
 function escapeHtml(value) { return value.replace(/[&<>"']/g, character => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' }[character])); }
@@ -72,4 +72,11 @@ document.querySelectorAll('.tab').forEach(tab => tab.addEventListener('click', (
 document.querySelector('#copy-button').addEventListener('click', () => copyText(currentResults.map(item => item.keyword).join('\n')));
 document.querySelector('#export-button').addEventListener('click', () => { const csv = 'Kata kunci,Intensi,Sumber\n' + currentResults.map(item => [item.keyword, item.intent, 'Google Suggest'].map(value => `"${String(value).replaceAll('"', '""')}"`).join(',')).join('\n'); const link = document.createElement('a'); link.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv' })); link.download = 'saran-google-suggest.csv'; link.click(); URL.revokeObjectURL(link.href); showToast('CSV berhasil diunduh'); });
 resultsBody.addEventListener('click', event => { const button = event.target.closest('[data-keyword]'); if (button) copyText(button.dataset.keyword); });
+resultsBody.addEventListener('click', event => {
+  const button = event.target.closest('[data-short]');
+  if (!button) return;
+  const shortKeyword = button.dataset.short.trim().split(/\s+/).slice(0, 2).join(' ');
+  keywordInput.value = shortKeyword;
+  generate(shortKeyword);
+});
 generate('kopi susu');
